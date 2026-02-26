@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>婚礼筹备清单 💒</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --pink-light: #fce7f3;
+            --pink: #f472b6;
+            --pink-dark: #db2777;
+            --gold: #fbbf24;
+            --gold-light: #fef3c7;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #fdf2f8 0%, #fefce8 100%);
+            min-height: 100vh;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #fdf2f8 0%, #fefce8 100%);
+        }
+        
+        .card-shadow {
+            box-shadow: 0 4px 15px rgba(244, 114, 182, 0.15);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #f472b6 0%, #ec4899 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(244, 114, 182, 0.4);
+        }
+        
+        .checkbox-custom:checked {
+            background: linear-gradient(135deg, #f472b6 0%, #ec4899 100%);
+            border-color: #ec4899;
+        }
+        
+        .urgent {
+            border-left: 4px solid #ef4444;
+        }
+        
+        .warning {
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .normal {
+            border-left: 4px solid #10b981;
+        }
+        
+        .overdue {
+            border-left: 4px solid #6b7280;
+            opacity: 0.7;
+        }
+        
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+        
+        .filter-btn.active {
+            background: linear-gradient(135deg, #f472b6 0%, #ec4899 100%);
+            color: white;
+        }
+        
+        .shimmer {
+            background: linear-gradient(90deg, #fdf2f8 25%, #fce7f3 50%, #fdf2f8 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .slide-up {
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        
+        /* 滚动条美化 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #fdf2f8;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #f9a8d4;
+            border-radius: 3px;
+        }
+        
+        /* 隐藏数字输入框的上下箭头 */
+        input[type="date"]::-webkit-inner-spin-button,
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(0.5);
+        }
+    </style>
+</head>
+<body class="gradient-bg">
+    <!-- 密码验证页面 -->
+    <div id="authScreen" class="fixed inset-0 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl p-8 w-full max-w-sm card-shadow fade-in">
+            <div class="text-center mb-8">
+                <div class="text-6xl mb-4">💒</div>
+                <h1 class="text-2xl font-bold text-pink-600 mb-2">婚礼筹备清单</h1>
+                <p class="text-gray-500 text-sm">请输入访问密码</p>
+            </div>
+            <div class="space-y-4">
+                <input 
+                    type="password" 
+                    id="passwordInput" 
+                    placeholder="输入密码"
+                    class="w-full px-4 py-3 border-2 border-pink-200 rounded-xl focus:outline-none focus:border-pink-400 text-center text-xl tracking-widest"
+                    maxlength="10"
+                >
+                <button 
+                    onclick="checkPassword()"
+                    class="w-full btn-primary text-white py-3 rounded-xl font-semibold text-lg"
+                >
+                    进入
+                </button>
+                <p id="passwordError" class="text-red-500 text-center text-sm hidden">密码错误，请重试</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主应用 -->
+    <div id="mainApp" class="hidden">
+        <!-- 顶部标题栏 -->
+        <header class="sticky top-0 bg-white/80 backdrop-blur-md z-40 border-b border-pink-100">
+            <div class="max-w-lg mx-auto px-4 py-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-xl font-bold text-pink-600">💒 婚礼筹备清单</h1>
+                        <p class="text-xs text-gray-500" id="statsText">0/0 已完成</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="showStats()" class="p-2 text-pink-500 hover:bg-pink-50 rounded-full">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 筛选栏 -->
+        <div class="sticky top-[73px] bg-white/80 backdrop-blur-md z-30 border-b border-pink-100">
+            <div class="max-w-lg mx-auto px-4 py-3">
+                <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-hide" id="filterContainer">
+                    <button class="filter-btn active px-4 py-1.5 rounded-full text-sm whitespace-nowrap border border-pink-200" data-category="all">
+                        全部
+                    </button>
+                    <button class="filter-btn px-4 py-1.5 rounded-full text-sm whitespace-nowrap border border-pink-200 text-gray-600" data-category="场地酒店">
+                        场地酒店
+                    </button>
+                    <button class="filter-btn px-4 py-1.5 rounded-full text-sm whitespace-nowrap border border-pink-200 text-gray-600" data-category="服装化妆">
+                        服装化妆
+                    </button>
+                    <button class="filter-btn px-4 py-1.5 rounded-full text-sm whitespace-nowrap border border-pink-200 text-gray-600" data-category="摄影摄像">
+                        摄影摄像
+                    </button>
+                    <button class="filter-btn px-4 py-1.5 rounded-full text-sm whitespace-nowrap border border-pink-200 text-gray-600" data-category="婚宴酒席">
+                        婚宴酒席
+                    </button>
+                    <button class="filter-btn px-4 py-1.5 rounded-full text-sm whitespace-nowrap border border-pink-200 text-gray-600" data-category="婚礼用品">
+                        婚礼用品
+                    </button>
+                    <button class="filter-btn px-4 py-1.5 rounded-full text-sm whitespace-nowrap border border-pink-200 text-gray-600" data-category="人员安排">
+                        人员安排
+                    </button>
+                    <button class="filter-btn px-4 py-1.5 rounded-full text-sm whitespace-nowrap border border-pink-200 text-gray-600" data-category="交通住宿">
+                        交通住宿
+                    </button>
+                    <button class="filter-btn px-4 py-1.5 rounded-full text-sm whitespace-nowrap border border-pink-200 text-gray-600" data-category="仪式用品">
+                        仪式用品
+                    </button>
+                    <button class="filter-btn px-4 py-1.5 rounded-full text-sm whitespace-nowrap border border-pink-200 text-gray-600" data-category="其他事项">
+                        其他事项
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 事项列表 -->
+        <main class="max-w-lg mx-auto px-4 py-4 pb-24">
+            <div id="taskList" class="space-y-3">
+                <!-- 事项卡片将在这里动态生成 -->
+            </div>
+            
+            <!-- 空状态 -->
+            <div id="emptyState" class="hidden text-center py-16">
+                <div class="text-6xl mb-4">🎉</div>
+                <h3 class="text-lg font-semibold text-gray-700 mb-2">还没有事项</h3>
+                <p class="text-gray-500 text-sm">点击下方按钮添加第一个筹备事项吧</p>
+            </div>
+        </main>
+
+        <!-- 添加按钮 -->
+        <button 
+            onclick="showAddModal()"
+            class="fixed bottom-6 right-6 w-14 h-14 btn-primary rounded-full text-white shadow-lg flex items-center justify-center z-40"
+        >
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+        </button>
+    </div>
+
+    <!-- 添加/编辑事项弹窗 -->
+    <div id="addModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-end justify-center">
+        <div class="bg-white rounded-t-3xl w-full max-w-lg p-6 slide-up">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-pink-600" id="modalTitle">添加事项</h2>
+                <button onclick="closeAddModal()" class="p-2 text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <form id="taskForm" class="space-y-4">
+                <input type="hidden" id="taskId">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">事项标题 *</label>
+                    <input 
+                        type="text" 
+                        id="taskTitle" 
+                        required
+                        placeholder="例如：预订婚宴酒店"
+                        class="w-full px-4 py-3 border border-pink-200 rounded-xl focus:outline-none focus:border-pink-400"
+                    >
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">分类 *</label>
+                    <select 
+                        id="taskCategory" 
+                        required
+                        class="w-full px-4 py-3 border border-pink-200 rounded-xl focus:outline-none focus:border-pink-400 bg-white"
+                    >
+                        <option value="">选择分类</option>
+                        <option value="场地酒店">场地酒店</option>
+                        <option value="服装化妆">服装化妆</option>
+                        <option value="摄影摄像">摄影摄像</option>
+                        <option value="婚宴酒席">婚宴酒席</option>
+                        <option value="婚礼用品">婚礼用品</option>
+                        <option value="人员安排">人员安排</option>
+                        <option value="交通住宿">交通住宿</option>
+                        <option value="仪式用品">仪式用品</option>
+                        <option value="其他事项">其他事项</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">责任人</label>
+                    <input 
+                        type="text" 
+                        id="taskPerson" 
+                        placeholder="例如：新郎/新娘"
+                        class="w-full px-4 py-3 border border-pink-200 rounded-xl focus:outline-none focus:border-pink-400"
+                    >
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">截止日期 *</label>
+                    <input 
+                        type="date" 
+                        id="taskDate" 
+                        required
+                        class="w-full px-4 py-3 border border-pink-200 rounded-xl focus:outline-none focus:border-pink-400"
+                    >
+                </div>
+                
+                <div class="flex gap-3 pt-4">
+                    <button 
+                        type="button"
+                        onclick="closeAddModal()"
+                        class="flex-1 py-3 border border-pink-200 rounded-xl text-gray-600 font-medium"
+                    >
+                        取消
+                    </button>
+                    <button 
+                        type="submit"
+                        class="flex-1 btn-primary text-white py-3 rounded-xl font-medium"
+                    >
+                        保存
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 统计弹窗 -->
+    <div id="statsModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-end justify-center">
+        <div class="bg-white rounded-t-3xl w-full max-w-lg p-6 slide-up">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-pink-600">📊 统计概览</h2>
+                <button onclick="closeStatsModal()" class="p-2 text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <div id="statsContent" class="space-y-4">
+                <!-- 统计内容将在这里动态生成 -->
+            </div>
+            
+            <div class="mt-6 pt-4 border-t border-pink-100">
+                <button 
+                    onclick="exportData()"
+                    class="w-full py-3 border border-pink-200 rounded-xl text-gray-600 font-medium flex items-center justify-center gap-2"
+                >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    导出数据
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 删除确认弹窗 -->
+    <div id="deleteModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm card-shadow fade-in">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">确认删除？</h3>
+                <p class="text-gray-500 text-sm">删除后无法恢复</p>
+            </div>
+            <div class="flex gap-3">
+                <button 
+                    onclick="closeDeleteModal()"
+                    class="flex-1 py-3 border border-gray-200 rounded-xl text-gray-600 font-medium"
+                >
+                    取消
+                </button>
+                <button 
+                    onclick="confirmDelete()"
+                    class="flex-1 bg-red-500 text-white py-3 rounded-xl font-medium"
+                >
+                    删除
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== 数据管理 =====
+        const STORAGE_KEY = 'wedding_checklist_tasks';
+        const AUTH_KEY = 'wedding_checklist_auth';
+        const PASSWORD = '1006';
+        
+        let tasks = [];
+        let currentFilter = 'all';
+        let deleteTaskId = null;
+        
+        // 加载数据
+        function loadTasks() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            tasks = data ? JSON.parse(data) : [];
+        }
+        
+        // 保存数据
+        function saveTasks() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+        }
+        
+        // ===== 密码验证 =====
+        function checkPassword() {
+            const input = document.getElementById('passwordInput').value;
+            if (input === PASSWORD) {
+                localStorage.setItem(AUTH_KEY, 'true');
+                showMainApp();
+            } else {
+                document.getElementById('passwordError').classList.remove('hidden');
+                document.getElementById('passwordInput').value = '';
+            }
+        }
+        
+        function showMainApp() {
+            document.getElementById('authScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            loadTasks();
+            renderTasks();
+        }
+        
+        // ===== 渲染任务列表 =====
+        function renderTasks() {
+            const taskList = document.getElementById('taskList');
+            const emptyState = document.getElementById('emptyState');
+            
+            // 筛选
+            let filteredTasks = currentFilter === 'all' 
+                ? tasks 
+                : tasks.filter(t => t.category === currentFilter);
+            
+            // 排序：未完成在前，按截止日期排序
+            filteredTasks.sort((a, b) => {
+                if (a.completed !== b.completed) return a.completed ? 1 : -1;
+                return new Date(a.date) - new Date(b.date);
+            });
+            
+            if (filteredTasks.length === 0) {
+                taskList.innerHTML = '';
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                taskList.innerHTML = filteredTasks.map(task => createTaskCard(task)).join('');
+            }
+            
+            updateStats();
+        }
+        
+        function createTaskCard(task) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const taskDate = new Date(task.date);
+            taskDate.setHours(0, 0, 0, 0);
+            
+            const daysLeft = Math.ceil((taskDate - today) / (1000 * 60 * 60 * 24));
+            
+            let urgencyClass = 'normal';
+            let urgencyText = '';
+            
+            if (task.completed) {
+                urgencyClass = 'normal';
+            } else if (daysLeft < 0) {
+                urgencyClass = 'overdue';
+                urgencyText = `已逾期 ${Math.abs(daysLeft)} 天`;
+            } else if (daysLeft === 0) {
+                urgencyClass = 'urgent';
+                urgencyText = '今天截止';
+            } else if (daysLeft <= 7) {
+                urgencyClass = 'urgent';
+                urgencyText = `${daysLeft} 天后`;
+            } else if (daysLeft <= 30) {
+                urgencyClass = 'warning';
+                urgencyText = `${daysLeft} 天后`;
+            } else {
+                urgencyText = formatDate(task.date);
+            }
+            
+            const categoryEmoji = {
+                '场地酒店': '🏨',
+                '服装化妆': '👗',
+                '摄影摄像': '📷',
+                '婚宴酒席': '🍽️',
+                '婚礼用品': '🎁',
+                '人员安排': '👥',
+                '交通住宿': '🚗',
+                '仪式用品': '💒',
+                '其他事项': '📌'
+            };
+            
+            return `
+                <div class="bg-white rounded-2xl p-4 card-shadow fade-in ${urgencyClass} ${task.completed ? 'opacity-60' : ''}" data-id="${task.id}">
+                    <div class="flex items-start gap-3">
+                        <button 
+                            onclick="toggleComplete('${task.id}')"
+                            class="mt-1 flex-shrink-0 w-6 h-6 rounded-full border-2 ${task.completed ? 'bg-pink-500 border-pink-500' : 'border-pink-300'} flex items-center justify-center"
+                        >
+                            ${task.completed ? '<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>' : ''}
+                        </button>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-semibold text-gray-800 ${task.completed ? 'line-through text-gray-400' : ''}">${escapeHtml(task.title)}</h3>
+                            <div class="flex flex-wrap gap-2 mt-2">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-pink-50 text-pink-600">
+                                    ${categoryEmoji[task.category] || '📌'} ${task.category}
+                                </span>
+                                ${task.person ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-amber-50 text-amber-600">👤 ${escapeHtml(task.person)}</span>` : ''}
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs ${urgencyClass === 'urgent' ? 'bg-red-50 text-red-600' : urgencyClass === 'warning' ? 'bg-amber-50 text-amber-600' : 'bg-gray-50 text-gray-600'}">
+                                    📅 ${urgencyText}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="flex gap-1">
+                            <button onclick="editTask('${task.id}')" class="p-2 text-gray-400 hover:text-pink-500">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                            </button>
+                            <button onclick="showDeleteModal('${task.id}')" class="p-2 text-gray-400 hover:text-red-500">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // ===== 任务操作 =====
+        function toggleComplete(id) {
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                task.completed = !task.completed;
+                saveTasks();
+                renderTasks();
+            }
+        }
+        
+        function showAddModal() {
+            document.getElementById('modalTitle').textContent = '添加事项';
+            document.getElementById('taskId').value = '';
+            document.getElementById('taskForm').reset();
+            // 设置默认日期为今天
+            document.getElementById('taskDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('addModal').classList.remove('hidden');
+        }
+        
+        function editTask(id) {
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                document.getElementById('modalTitle').textContent = '编辑事项';
+                document.getElementById('taskId').value = task.id;
+                document.getElementById('taskTitle').value = task.title;
+                document.getElementById('taskCategory').value = task.category;
+                document.getElementById('taskPerson').value = task.person || '';
+                document.getElementById('taskDate').value = task.date;
+                document.getElementById('addModal').classList.remove('hidden');
+            }
+        }
+        
+        function closeAddModal() {
+            document.getElementById('addModal').classList.add('hidden');
+        }
+        
+        function showDeleteModal(id) {
+            deleteTaskId = id;
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+        
+        function closeDeleteModal() {
+            deleteTaskId = null;
+            document.getElementById('deleteModal').classList.add('hidden');
+        }
+        
+        function confirmDelete() {
+            if (deleteTaskId) {
+                tasks = tasks.filter(t => t.id !== deleteTaskId);
+                saveTasks();
+                renderTasks();
+                closeDeleteModal();
+            }
+        }
+        
+        // 表单提交
+        document.getElementById('taskForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('taskId').value;
+            const title = document.getElementById('taskTitle').value.trim();
+            const category = document.getElementById('taskCategory').value;
+            const person = document.getElementById('taskPerson').value.trim();
+            const date = document.getElementById('taskDate').value;
+            
+            if (id) {
+                // 编辑
+                const task = tasks.find(t => t.id === id);
+                if (task) {
+                    task.title = title;
+                    task.category = category;
+                    task.person = person;
+                    task.date = date;
+                }
+            } else {
+                // 添加
+                tasks.push({
+                    id: Date.now().toString(),
+                    title,
+                    category,
+                    person,
+                    date,
+                    completed: false,
+                    createdAt: new Date().toISOString()
+                });
+            }
+            
+            saveTasks();
+            renderTasks();
+            closeAddModal();
+        });
+        
+        // ===== 筛选 =====
+        document.getElementById('filterContainer').addEventListener('click', function(e) {
+            const btn = e.target.closest('.filter-btn');
+            if (btn) {
+                document.querySelectorAll('.filter-btn').forEach(b => {
+                    b.classList.remove('active');
+                    b.classList.add('text-gray-600');
+                });
+                btn.classList.add('active');
+                btn.classList.remove('text-gray-600');
+                currentFilter = btn.dataset.category;
+                renderTasks();
+            }
+        });
+        
+        // ===== 统计 =====
+        function updateStats() {
+            const total = tasks.length;
+            const completed = tasks.filter(t => t.completed).length;
+            document.getElementById('statsText').textContent = `${completed}/${total} 已完成`;
+        }
+        
+        function showStats() {
+            const total = tasks.length;
+            const completed = tasks.filter(t => t.completed).length;
+            const pending = total - completed;
+            
+            // 按分类统计
+            const categoryStats = {};
+            tasks.forEach(t => {
+                if (!categoryStats[t.category]) {
+                    categoryStats[t.category] = { total: 0, completed: 0 };
+                }
+                categoryStats[t.category].total++;
+                if (t.completed) categoryStats[t.category].completed++;
+            });
+            
+            // 紧急事项
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const urgent = tasks.filter(t => {
+                if (t.completed) return false;
+                const taskDate = new Date(t.date);
+                taskDate.setHours(0, 0, 0, 0);
+                const daysLeft = Math.ceil((taskDate - today) / (1000 * 60 * 60 * 24));
+                return daysLeft <= 7;
+            }).length;
+            
+            const statsContent = document.getElementById('statsContent');
+            statsContent.innerHTML = `
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="bg-pink-50 rounded-xl p-4 text-center">
+                        <div class="text-2xl font-bold text-pink-600">${total}</div>
+                        <div class="text-xs text-gray-500 mt-1">总事项</div>
+                    </div>
+                    <div class="bg-green-50 rounded-xl p-4 text-center">
+                        <div class="text-2xl font-bold text-green-600">${completed}</div>
+                        <div class="text-xs text-gray-500 mt-1">已完成</div>
+                    </div>
+                    <div class="bg-amber-50 rounded-xl p-4 text-center">
+                        <div class="text-2xl font-bold text-amber-600">${pending}</div>
+                        <div class="text-xs text-gray-500 mt-1">待完成</div>
+                    </div>
+                </div>
+                
+                <div class="bg-red-50 rounded-xl p-4 flex items-center justify-between">
+                    <span class="text-red-600">⚠️ 一周内待办</span>
+                    <span class="text-xl font-bold text-red-600">${urgent}</span>
+                </div>
+                
+                <div class="space-y-2">
+                    <h3 class="font-semibold text-gray-700">按分类统计</h3>
+                    ${Object.entries(categoryStats).map(([cat, stats]) => `
+                        <div class="flex items-center gap-3">
+                            <span class="flex-1 text-sm text-gray-600">${cat}</span>
+                            <div class="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
+                                <div class="h-full bg-pink-400 rounded-full" style="width: ${stats.total > 0 ? (stats.completed / stats.total * 100) : 0}%"></div>
+                            </div>
+                            <span class="text-xs text-gray-500 w-12 text-right">${stats.completed}/${stats.total}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div class="mt-4 pt-4 border-t border-pink-100">
+                    <div class="flex justify-between text-sm text-gray-500">
+                        <span>完成进度</span>
+                        <span>${total > 0 ? Math.round(completed / total * 100) : 0}%</span>
+                    </div>
+                    <div class="w-full h-3 bg-gray-100 rounded-full overflow-hidden mt-2">
+                        <div class="h-full bg-gradient-to-r from-pink-400 to-pink-600 rounded-full transition-all duration-500" style="width: ${total > 0 ? (completed / total * 100) : 0}%"></div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('statsModal').classList.remove('hidden');
+        }
+        
+        function closeStatsModal() {
+            document.getElementById('statsModal').classList.add('hidden');
+        }
+        
+        // ===== 导出数据 =====
+        function exportData() {
+            const dataStr = JSON.stringify(tasks, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `婚礼筹备清单_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // ===== 工具函数 =====
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return `${date.getMonth() + 1}月${date.getDate()}日`;
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // ===== 初始化 =====
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查是否已验证
+            const isAuthed = localStorage.getItem(AUTH_KEY) === 'true';
+            if (isAuthed) {
+                showMainApp();
+            } else {
+                document.getElementById('authScreen').classList.remove('hidden');
+            }
+            
+            // 密码输入框回车提交
+            document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    checkPassword();
+                }
+            });
+        });
+        
+        // 点击模态框背景关闭
+        document.getElementById('addModal').addEventListener('click', function(e) {
+            if (e.target === this) closeAddModal();
+        });
+        
+        document.getElementById('statsModal').addEventListener('click', function(e) {
+            if (e.target === this) closeStatsModal();
+        });
+        
+        document.getElementById('deleteModal').addEventListener('click', function(e) {
+            if (e.target === this) closeDeleteModal();
+        });
+    </script>
+</body>
+</html>
