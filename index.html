@@ -458,9 +458,10 @@ const DEFAULT_TASKS = [
 
 const INIT_KEY = 'wedding_checklist_initialized';
 
-// 初始化默认事项
+// 初始化默认事项（仅首次）
 function initDefaultTasks() {
-    if (localStorage.getItem(INIT_KEY) !== 'true') {
+    const initialized = localStorage.getItem(INIT_KEY);
+    if (initialized !== 'true' && tasks.length === 0) {
         tasks = DEFAULT_TASKS;
         saveTasks();
         localStorage.setItem(INIT_KEY, 'true');
