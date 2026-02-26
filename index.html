@@ -380,11 +380,92 @@
         // ===== 数据管理 =====
         const STORAGE_KEY = 'wedding_checklist_tasks';
         const AUTH_KEY = 'wedding_checklist_auth';
-        const PASSWORD = '1006';
+        const PASSWORD = '1003';
         
         let tasks = [];
         let currentFilter = 'all';
         let deleteTaskId = null;
+        
+// ===== 预设事项 =====
+const DEFAULT_TASKS = [
+    // 婚前 6-7 个月（3月）
+    { id: '1', title: '预订婚礼场地/酒店', category: '场地酒店', date: '2026-03-15', completed: false },
+    { id: '2', title: '预订婚礼主持/司仪', category: '人员安排', date: '2026-03-15', completed: false },
+    { id: '3', title: '预订摄影师、摄像师', category: '摄影摄像', date: '2026-03-31', completed: false },
+    { id: '4', title: '预订婚礼策划师', category: '人员安排', date: '2026-03-31', completed: false },
+    
+    // 婚前 5-6 个月（4-5月）
+    { id: '5', title: '挑选并预订婚纱', category: '服装化妆', date: '2026-04-15', completed: false },
+    { id: '6', title: '挑选新郎西装/礼服', category: '服装化妆', date: '2026-04-15', completed: false },
+    { id: '7', title: '预订新娘化妆师（试妆）', category: '服装化妆', date: '2026-04-30', completed: false },
+    { id: '8', title: '拍摄婚纱照', category: '摄影摄像', date: '2026-05-15', completed: false },
+    { id: '9', title: '挑选伴娘服、伴郎服', category: '服装化妆', date: '2026-05-31', completed: false },
+    
+    // 婚前 4-5 个月（5-6月）
+    { id: '10', title: '确定婚宴菜单', category: '婚宴酒席', date: '2026-05-31', completed: false },
+    { id: '11', title: '挑选结婚戒指', category: '婚礼用品', date: '2026-06-15', completed: false },
+    { id: '12', title: '确定伴郎伴娘人选', category: '人员安排', date: '2026-06-15', completed: false },
+    { id: '13', title: '挑选婚礼请柬样式', category: '婚礼用品', date: '2026-06-30', completed: false },
+    
+    // 婚前 3-4 个月（6-7月）
+    { id: '14', title: '发送婚礼请柬', category: '婚礼用品', date: '2026-07-15', completed: false },
+    { id: '15', title: '准备喜糖及包装', category: '婚礼用品', date: '2026-07-15', completed: false },
+    { id: '16', title: '预订婚车（头车、车队）', category: '交通住宿', date: '2026-07-31', completed: false },
+    { id: '17', title: '安排外地宾客住宿', category: '交通住宿', date: '2026-07-31', completed: false },
+    { id: '18', title: '确定婚礼仪式流程', category: '仪式用品', date: '2026-07-31', completed: false },
+    
+    // 婚前 2 个月（8月）
+    { id: '19', title: '统计宾客名单，确认出席人数', category: '婚宴酒席', date: '2026-08-15', completed: false },
+    { id: '20', title: '安排宾客座位表', category: '婚宴酒席', date: '2026-08-31', completed: false },
+    { id: '21', title: '召集伴郎伴娘开会分工', category: '人员安排', date: '2026-08-31', completed: false },
+    { id: '22', title: '准备迎亲游戏道具', category: '婚礼用品', date: '2026-08-31', completed: false },
+    
+    // 婚前 1 个月（9月）
+    { id: '23', title: '与酒店确认最终细节', category: '场地酒店', date: '2026-09-10', completed: false },
+    { id: '24', title: '婚纱最终试穿修改', category: '服装化妆', date: '2026-09-10', completed: false },
+    { id: '25', title: '与摄影师沟通拍摄需求', category: '摄影摄像', date: '2026-09-15', completed: false },
+    { id: '26', title: '准备婚礼誓词', category: '仪式用品', date: '2026-09-15', completed: false },
+    { id: '27', title: '订购手捧花、胸花、腕花', category: '仪式用品', date: '2026-09-20', completed: false },
+    { id: '28', title: '兑换新钞准备红包', category: '婚礼用品', date: '2026-09-25', completed: false },
+    
+    // 婚前 1-2 周（9月中下旬）
+    { id: '29', title: '布置婚房/新房', category: '其他事项', date: '2026-09-26', completed: false },
+    { id: '30', title: '召开婚礼筹备会议（全体工作人员）', category: '人员安排', date: '2026-09-27', completed: false },
+    { id: '31', title: '染发、剪发、美甲', category: '服装化妆', date: '2026-09-28', completed: false },
+    { id: '32', title: '检查所有物品是否齐全', category: '其他事项', date: '2026-09-29', completed: false },
+    { id: '33', title: '与所有供应商最终确认时间', category: '其他事项', date: '2026-09-30', completed: false },
+    
+    // 婚前 1-3 天
+    { id: '34', title: '准备迎亲红包（堵门用）', category: '婚礼用品', date: '2026-10-01', completed: false },
+    { id: '35', title: '取回鲜花、蛋糕等易损物品', category: '仪式用品', date: '2026-10-02', completed: false },
+    
+    // 婚礼当天
+    { id: '36', title: '早起化妆造型', category: '服装化妆', date: '2026-10-03', completed: false },
+    { id: '37', title: '迎亲仪式', category: '仪式用品', date: '2026-10-03', completed: false },
+    { id: '38', title: '敬茶仪式', category: '仪式用品', date: '2026-10-03', completed: false },
+    { id: '39', title: '婚礼仪式', category: '仪式用品', date: '2026-10-03', completed: false },
+    { id: '40', title: '婚宴敬酒', category: '婚宴酒席', date: '2026-10-03', completed: false },
+    
+    // 其他重要事项
+    { id: '41', title: '办理结婚登记（领证）', category: '其他事项', date: '2026-06-01', completed: false },
+    { id: '42', title: '安排婚前体检', category: '其他事项', date: '2026-05-01', completed: false },
+    { id: '43', title: '新娘开始护肤美容计划', category: '服装化妆', date: '2026-03-01', completed: false },
+    { id: '44', title: '购买床上用品（嫁妆）', category: '婚礼用品', date: '2026-08-01', completed: false },
+    { id: '45', title: '准备婚礼回礼/伴手礼', category: '婚礼用品', date: '2026-09-01', completed: false },
+    { id: '46', title: '准备新娘应急包', category: '婚礼用品', date: '2026-09-25', completed: false },
+    { id: '47', title: '安排蜜月旅行', category: '其他事项', date: '2026-09-01', completed: false }
+];
+
+const INIT_KEY = 'wedding_checklist_initialized';
+
+// 初始化默认事项
+function initDefaultTasks() {
+    if (localStorage.getItem(INIT_KEY) !== 'true') {
+        tasks = DEFAULT_TASKS;
+        saveTasks();
+        localStorage.setItem(INIT_KEY, 'true');
+    }
+}
         
         // 加载数据
         function loadTasks() {
@@ -413,6 +494,7 @@
             document.getElementById('authScreen').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
             loadTasks();
+            initDefaultTasks();
             renderTasks();
         }
         
