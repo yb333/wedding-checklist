@@ -392,6 +392,7 @@
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
                     return true;
                 }
+                // GitHub 上数据为空，但获取到了 sha，可以用于后续保存
                 return false;
             } catch (e) {
                 console.log('GitHub load failed:', e);
@@ -400,9 +401,24 @@
         }
         
         async function saveToGitHub() {
-            setSyncStatus('sync-pending');
             try {
                 const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
+                
+                // 如果没有 sha，先获取
+                if (!githubSha) {
+                    try {
+                        const getResponse = await fetch(url, {
+                            headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` }
+                        });
+                        if (getResponse.ok) {
+                            const getData = await getResponse.json();
+                            githubSha = getData.sha;
+                        }
+                    } catch (e) {
+                        // 文件可能不存在，继续创建
+                    }
+                }
+                
                 const content = {
                     tasks: tasks,
                     lastUpdated: new Date().toISOString()
@@ -411,8 +427,12 @@
                 const body = {
                     message: `更新数据 ${new Date().toLocaleString('zh-CN')}`,
                     content: btoa(unescape(encodeURIComponent(JSON.stringify(content, null, 2)))),
-                    sha: githubSha
                 };
+                
+                // 只有有 sha 时才传入
+                if (githubSha) {
+                    body.sha = githubSha;
+                }
                 
                 const response = await fetch(url, {
                     method: 'PUT',
@@ -423,7 +443,12 @@
                     body: JSON.stringify(body)
                 });
                 
-                if (!response.ok) throw new Error('GitHub save error');
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error('GitHub save error:', errorData);
+                    setSyncStatus('sync-error');
+                    return false;
+                }
                 
                 const data = await response.json();
                 githubSha = data.content.sha;
@@ -496,23 +521,12 @@
         async function manualSync() {
             setSyncStatus('sync-pending');
             
-            // 先尝试从 GitHub 拉取
-            const loaded = await loadFromGitHub();
-            
-            if (loaded) {
-                renderTasks();
-                setSyncStatus('sync-ok');
-                showToast('同步成功！已拉取最新数据');
+            // 直接推送本地数据到 GitHub
+            const saved = await saveToGitHub();
+            if (saved) {
+                showToast('同步成功！');
             } else {
-                // 拉取失败，尝试推送本地数据
-                const saved = await saveToGitHub();
-                if (saved) {
-                    setSyncStatus('sync-ok');
-                    showToast('同步成功！已推送本地数据');
-                } else {
-                    setSyncStatus('sync-error');
-                    showToast('同步失败，请检查网络');
-                }
+                showToast('同步失败，请检查网络');
             }
         }
         
