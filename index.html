@@ -8,309 +8,112 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
         
-        :root {
-            --pink-light: #fce7f3;
-            --pink: #f472b6;
-            --pink-dark: #db2777;
-            --gold: #fbbf24;
-            --gold-light: #fef3c7;
-        }
-        
-        * {
-            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        }
-        
+        * { font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
         body {
             background: linear-gradient(180deg, #fff5f7 0%, #fff0f5 50%, #fef2f8 100%);
             min-height: 100vh;
             -webkit-tap-highlight-color: transparent;
         }
-        
-        /* 自定义滚动条 */
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #f9a8d4; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #f472b6; }
         
-        /* 卡片阴影 */
         .card-shadow {
-            box-shadow: 0 2px 8px rgba(244, 114, 182, 0.08), 
-                        0 4px 16px rgba(244, 114, 182, 0.04);
+            box-shadow: 0 2px 8px rgba(244, 114, 182, 0.08), 0 4px 16px rgba(244, 114, 182, 0.04);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        
         .card-shadow:hover {
-            box-shadow: 0 4px 12px rgba(244, 114, 182, 0.12), 
-                        0 8px 24px rgba(244, 114, 182, 0.08);
+            box-shadow: 0 4px 12px rgba(244, 114, 182, 0.12), 0 8px 24px rgba(244, 114, 182, 0.08);
             transform: translateY(-2px);
         }
         
-        /* 主按钮 */
         .btn-primary {
             background: linear-gradient(135deg, #f472b6 0%, #ec4899 50%, #db2777 100%);
             box-shadow: 0 4px 14px rgba(236, 72, 153, 0.4);
             transition: all 0.3s ease;
         }
-        
         .btn-primary:hover {
             transform: translateY(-2px) scale(1.02);
             box-shadow: 0 6px 20px rgba(236, 72, 153, 0.5);
         }
+        .btn-primary:active { transform: translateY(0) scale(0.98); }
         
-        .btn-primary:active {
-            transform: translateY(0) scale(0.98);
-        }
-        
-        /* 紧急程度指示条 */
-        .urgency-indicator {
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            border-radius: 4px 0 0 4px;
-        }
-        
+        .urgency-indicator { position: absolute; left: 0; top: 0; bottom: 0; width: 4px; border-radius: 4px 0 0 4px; }
         .urgency-urgent { background: linear-gradient(180deg, #ef4444, #f87171); }
         .urgency-warning { background: linear-gradient(180deg, #f59e0b, #fbbf24); }
         .urgency-normal { background: linear-gradient(180deg, #10b981, #34d399); }
         .urgency-overdue { background: linear-gradient(180deg, #6b7280, #9ca3af); }
         
-        /* 完成状态 */
-        .task-completed {
-            opacity: 0.6;
-        }
+        .task-completed { opacity: 0.6; }
+        .task-completed .task-title { text-decoration: line-through; color: #9ca3af; }
         
-        .task-completed .task-title {
-            text-decoration: line-through;
-            color: #9ca3af;
-        }
-        
-        /* 复选框动画 */
-        .checkbox-wrapper {
-            position: relative;
-            width: 24px;
-            height: 24px;
-            flex-shrink: 0;
-        }
-        
-        .checkbox-wrapper input {
-            opacity: 0;
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-            z-index: 2;
-        }
-        
+        .checkbox-wrapper { position: relative; width: 24px; height: 24px; flex-shrink: 0; }
+        .checkbox-wrapper input { opacity: 0; position: absolute; width: 100%; height: 100%; cursor: pointer; z-index: 2; }
         .checkbox-custom {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 24px;
-            height: 24px;
-            border: 2px solid #f9a8d4;
-            border-radius: 50%;
-            background: white;
-            transition: all 0.3s ease;
+            position: absolute; top: 0; left: 0; width: 24px; height: 24px;
+            border: 2px solid #f9a8d4; border-radius: 50%; background: white; transition: all 0.3s ease;
         }
-        
-        .checkbox-wrapper input:checked + .checkbox-custom {
-            background: linear-gradient(135deg, #f472b6, #ec4899);
-            border-color: #ec4899;
-        }
-        
+        .checkbox-wrapper input:checked + .checkbox-custom { background: linear-gradient(135deg, #f472b6, #ec4899); border-color: #ec4899; }
         .checkbox-custom::after {
-            content: '';
-            position: absolute;
-            left: 8px;
-            top: 4px;
-            width: 6px;
-            height: 11px;
-            border: solid white;
-            border-width: 0 2px 2px 0;
-            transform: rotate(45deg) scale(0);
-            transition: transform 0.2s ease;
+            content: ''; position: absolute; left: 8px; top: 4px; width: 6px; height: 11px;
+            border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg) scale(0); transition: transform 0.2s ease;
         }
+        .checkbox-wrapper input:checked + .checkbox-custom::after { transform: rotate(45deg) scale(1); }
         
-        .checkbox-wrapper input:checked + .checkbox-custom::after {
-            transform: rotate(45deg) scale(1);
-        }
+        .filter-btn { transition: all 0.2s ease; white-space: nowrap; }
+        .filter-btn.active { background: linear-gradient(135deg, #f472b6, #ec4899); color: white; border-color: transparent; box-shadow: 0 2px 8px rgba(236, 72, 153, 0.3); }
+        .filter-btn:not(.active):hover { background: #fce7f3; border-color: #f9a8d4; }
         
-        /* 筛选按钮 */
-        .filter-btn {
-            transition: all 0.2s ease;
-            white-space: nowrap;
-        }
-        
-        .filter-btn.active {
-            background: linear-gradient(135deg, #f472b6, #ec4899);
-            color: white;
-            border-color: transparent;
-            box-shadow: 0 2px 8px rgba(236, 72, 153, 0.3);
-        }
-        
-        .filter-btn:not(.active):hover {
-            background: #fce7f3;
-            border-color: #f9a8d4;
-        }
-        
-        /* 标签样式 */
-        .tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-        
+        .tag { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
         .tag-category { background: #fce7f3; color: #be185d; }
         .tag-person { background: #fef3c7; color: #b45309; }
         .tag-date { background: #ecfdf5; color: #059669; }
         .tag-urgent { background: #fef2f2; color: #dc2626; }
         .tag-warning { background: #fffbeb; color: #d97706; }
         
-        /* 模态框 */
-        .modal-overlay {
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(8px);
-        }
+        .modal-overlay { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px); }
+        .modal-content { animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-fade { animation: modalFade 0.2s ease; }
+        @keyframes modalFade { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         
-        .modal-content {
-            animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+        .task-card { animation: taskFadeIn 0.3s ease; }
+        @keyframes taskFadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        @keyframes slideUp {
-            from { transform: translateY(100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
+        @keyframes celebrate { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+        .celebrate { animation: celebrate 0.4s ease; }
         
-        .modal-fade {
-            animation: modalFade 0.2s ease;
-        }
+        .progress-bar { background: linear-gradient(90deg, #f472b6, #ec4899, #db2777); background-size: 200% 100%; animation: shimmer 2s linear infinite; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
         
-        @keyframes modalFade {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
+        .empty-state { text-align: center; padding: 60px 20px; }
+        .empty-state-icon { font-size: 64px; margin-bottom: 16px; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         
-        /* 任务卡片动画 */
-        .task-card {
-            animation: taskFadeIn 0.3s ease;
-        }
-        
-        @keyframes taskFadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* 完成庆祝动画 */
-        @keyframes celebrate {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-        
-        .celebrate {
-            animation: celebrate 0.4s ease;
-        }
-        
-        /* 进度条 */
-        .progress-bar {
-            background: linear-gradient(90deg, #f472b6, #ec4899, #db2777);
-            background-size: 200% 100%;
-            animation: shimmer 2s linear infinite;
-        }
-        
-        @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-        
-        /* 空状态 */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-        }
-        
-        .empty-state-icon {
-            font-size: 64px;
-            margin-bottom: 16px;
-            animation: float 3s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        /* 添加按钮 */
         .fab {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            width: 56px;
-            height: 56px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 40;
-            box-shadow: 0 4px 20px rgba(236, 72, 153, 0.4);
+            position: fixed; bottom: 24px; right: 24px; width: 56px; height: 56px;
+            border-radius: 16px; display: flex; align-items: center; justify-content: center;
+            z-index: 40; box-shadow: 0 4px 20px rgba(236, 72, 153, 0.4);
         }
-        
         .fab::before {
-            content: '';
-            position: absolute;
-            inset: -4px;
-            border-radius: 20px;
-            background: linear-gradient(135deg, #f472b6, #ec4899);
-            opacity: 0.3;
-            animation: pulse 2s ease-in-out infinite;
+            content: ''; position: absolute; inset: -4px; border-radius: 20px;
+            background: linear-gradient(135deg, #f472b6, #ec4899); opacity: 0.3; animation: pulse 2s ease-in-out infinite;
         }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.3; } 50% { transform: scale(1.1); opacity: 0.1; } }
         
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.3; }
-            50% { transform: scale(1.1); opacity: 0.1; }
-        }
+        .header-bg { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        .stat-card { background: white; border-radius: 16px; padding: 16px; text-align: center; box-shadow: 0 2px 8px rgba(244, 114, 182, 0.06); }
         
-        /* 头部 */
-        .header-bg {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-        }
+        input[type="date"] { appearance: none; -webkit-appearance: none; }
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.6); cursor: pointer; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
         
-        /* 统计卡片 */
-        .stat-card {
-            background: white;
-            border-radius: 16px;
-            padding: 16px;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(244, 114, 182, 0.06);
-        }
-        
-        /* 日期输入美化 */
-        input[type="date"] {
-            appearance: none;
-            -webkit-appearance: none;
-        }
-        
-        input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(0.6);
-            cursor: pointer;
-        }
-        
-        /* 隐藏横向滚动条 */
-        .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-        }
+        .sync-status { font-size: 11px; padding: 2px 8px; border-radius: 10px; }
+        .sync-ok { background: #dcfce7; color: #16a34a; }
+        .sync-pending { background: #fef3c7; color: #d97706; }
+        .sync-error { background: #fef2f2; color: #dc2626; }
     </style>
 </head>
 <body>
@@ -323,21 +126,9 @@
                 <p class="text-gray-400 text-sm">输入密码查看筹备清单</p>
             </div>
             <div class="space-y-4">
-                <div class="relative">
-                    <input 
-                        type="password" 
-                        id="passwordInput" 
-                        placeholder="请输入密码"
-                        class="w-full px-4 py-4 border-2 border-pink-100 rounded-2xl focus:outline-none focus:border-pink-300 text-center text-xl tracking-widest bg-pink-50/50 transition-all"
-                        maxlength="10"
-                    >
-                </div>
-                <button 
-                    onclick="checkPassword()"
-                    class="w-full btn-primary text-white py-4 rounded-2xl font-semibold text-lg"
-                >
-                    进入 💕
-                </button>
+                <input type="password" id="passwordInput" placeholder="请输入密码"
+                    class="w-full px-4 py-4 border-2 border-pink-100 rounded-2xl focus:outline-none focus:border-pink-300 text-center text-xl tracking-widest bg-pink-50/50 transition-all" maxlength="10">
+                <button onclick="checkPassword()" class="w-full btn-primary text-white py-4 rounded-2xl font-semibold text-lg">进入 💕</button>
                 <p id="passwordError" class="text-red-400 text-center text-sm hidden">密码错误，请重新输入</p>
             </div>
         </div>
@@ -345,17 +136,15 @@
 
     <!-- 主应用 -->
     <div id="mainApp" class="hidden">
-        <!-- 顶部标题栏 -->
         <header class="sticky top-0 header-bg z-40 border-b border-pink-100/50">
             <div class="max-w-lg mx-auto px-4 py-4">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h1 class="text-xl font-bold bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent">
-                            💒 婚礼筹备
-                        </h1>
+                        <h1 class="text-xl font-bold bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent">💒 婚礼筹备</h1>
                         <p class="text-xs text-gray-400 mt-0.5" id="statsText">0/0 已完成</p>
                     </div>
-                    <div class="flex gap-2">
+                    <div class="flex gap-2 items-center">
+                        <span id="syncStatus" class="sync-status sync-ok">已同步</span>
                         <button onclick="showStats()" class="p-2.5 text-pink-400 hover:bg-pink-50 rounded-xl transition-colors">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
@@ -363,8 +152,6 @@
                         </button>
                     </div>
                 </div>
-                
-                <!-- 进度条 -->
                 <div class="mt-3">
                     <div class="h-1.5 bg-pink-100 rounded-full overflow-hidden">
                         <div id="progressBar" class="h-full progress-bar rounded-full transition-all duration-500" style="width: 0%"></div>
@@ -373,51 +160,25 @@
             </div>
         </header>
 
-        <!-- 筛选栏 -->
         <div class="sticky top-[100px] header-bg z-30">
             <div class="max-w-lg mx-auto px-4 py-3">
                 <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-hide" id="filterContainer">
-                    <button class="filter-btn active px-4 py-2 rounded-full text-sm border border-pink-200" data-category="all">
-                        ✨ 全部
-                    </button>
-                    <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="场地酒店">
-                        🏨 场地
-                    </button>
-                    <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="服装化妆">
-                        👗 服装
-                    </button>
-                    <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="摄影摄像">
-                        📷 摄影
-                    </button>
-                    <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="婚宴酒席">
-                        🍽️ 婚宴
-                    </button>
-                    <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="婚礼用品">
-                        🎁 用品
-                    </button>
-                    <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="人员安排">
-                        👥 人员
-                    </button>
-                    <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="交通住宿">
-                        🚗 交通
-                    </button>
-                    <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="仪式用品">
-                        💒 仪式
-                    </button>
-                    <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="其他事项">
-                        📌 其他
-                    </button>
+                    <button class="filter-btn active px-4 py-2 rounded-full text-sm border border-pink-200" data-category="all">✨ 全部</button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="场地酒店">🏨 场地</button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="服装化妆">👗 服装</button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="摄影摄像">📷 摄影</button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="婚宴酒席">🍽️ 婚宴</button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="婚礼用品">🎁 用品</button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="人员安排">👥 人员</button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="交通住宿">🚗 交通</button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="仪式用品">💒 仪式</button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="其他事项">📌 其他</button>
                 </div>
             </div>
         </div>
 
-        <!-- 事项列表 -->
         <main class="max-w-lg mx-auto px-4 py-4 pb-24">
-            <div id="taskList" class="space-y-3">
-                <!-- 事项卡片将在这里动态生成 -->
-            </div>
-            
-            <!-- 空状态 -->
+            <div id="taskList" class="space-y-3"></div>
             <div id="emptyState" class="empty-state hidden">
                 <div class="empty-state-icon">🎉</div>
                 <h3 class="text-lg font-semibold text-gray-600 mb-2">暂无事项</h3>
@@ -425,7 +186,6 @@
             </div>
         </main>
 
-        <!-- 添加按钮 -->
         <button onclick="showAddModal()" class="fab btn-primary text-white">
             <svg class="w-7 h-7 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
@@ -439,33 +199,18 @@
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-xl font-bold text-gray-800" id="modalTitle">添加事项</h2>
                 <button onclick="closeAddModal()" class="p-2 text-gray-300 hover:text-gray-500 rounded-full hover:bg-gray-100 transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-            
             <form id="taskForm" class="space-y-5">
                 <input type="hidden" id="taskId">
-                
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">事项标题 <span class="text-pink-400">*</span></label>
-                    <input 
-                        type="text" 
-                        id="taskTitle" 
-                        required
-                        placeholder="例如：预订婚宴酒店"
-                        class="w-full px-4 py-3.5 border border-pink-100 rounded-xl focus:outline-none focus:border-pink-300 bg-pink-50/30 transition-all"
-                    >
+                    <input type="text" id="taskTitle" required placeholder="例如：预订婚宴酒店" class="w-full px-4 py-3.5 border border-pink-100 rounded-xl focus:outline-none focus:border-pink-300 bg-pink-50/30 transition-all">
                 </div>
-                
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">分类 <span class="text-pink-400">*</span></label>
-                    <select 
-                        id="taskCategory" 
-                        required
-                        class="w-full px-4 py-3.5 border border-pink-100 rounded-xl focus:outline-none focus:border-pink-300 bg-pink-50/30 transition-all"
-                    >
+                    <select id="taskCategory" required class="w-full px-4 py-3.5 border border-pink-100 rounded-xl focus:outline-none focus:border-pink-300 bg-pink-50/30 transition-all">
                         <option value="">选择分类</option>
                         <option value="场地酒店">🏨 场地酒店</option>
                         <option value="服装化妆">👗 服装化妆</option>
@@ -478,41 +223,17 @@
                         <option value="其他事项">📌 其他事项</option>
                     </select>
                 </div>
-                
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">责任人</label>
-                    <input 
-                        type="text" 
-                        id="taskPerson" 
-                        placeholder="例如：新郎/新娘/妈妈"
-                        class="w-full px-4 py-3.5 border border-pink-100 rounded-xl focus:outline-none focus:border-pink-300 bg-pink-50/30 transition-all"
-                    >
+                    <input type="text" id="taskPerson" placeholder="例如：新郎/新娘/妈妈" class="w-full px-4 py-3.5 border border-pink-100 rounded-xl focus:outline-none focus:border-pink-300 bg-pink-50/30 transition-all">
                 </div>
-                
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">截止日期 <span class="text-pink-400">*</span></label>
-                    <input 
-                        type="date" 
-                        id="taskDate" 
-                        required
-                        class="w-full px-4 py-3.5 border border-pink-100 rounded-xl focus:outline-none focus:border-pink-300 bg-pink-50/30 transition-all"
-                    >
+                    <input type="date" id="taskDate" required class="w-full px-4 py-3.5 border border-pink-100 rounded-xl focus:outline-none focus:border-pink-300 bg-pink-50/30 transition-all">
                 </div>
-                
                 <div class="flex gap-3 pt-4">
-                    <button 
-                        type="button"
-                        onclick="closeAddModal()"
-                        class="flex-1 py-3.5 border border-gray-200 rounded-xl text-gray-500 font-medium hover:bg-gray-50 transition-colors"
-                    >
-                        取消
-                    </button>
-                    <button 
-                        type="submit"
-                        class="flex-1 btn-primary text-white py-3.5 rounded-xl font-medium"
-                    >
-                        保存
-                    </button>
+                    <button type="button" onclick="closeAddModal()" class="flex-1 py-3.5 border border-gray-200 rounded-xl text-gray-500 font-medium hover:bg-gray-50 transition-colors">取消</button>
+                    <button type="submit" class="flex-1 btn-primary text-white py-3.5 rounded-xl font-medium">保存</button>
                 </div>
             </form>
         </div>
@@ -524,24 +245,13 @@
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-xl font-bold text-gray-800">📊 统计概览</h2>
                 <button onclick="closeStatsModal()" class="p-2 text-gray-300 hover:text-gray-500 rounded-full hover:bg-gray-100 transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-            
-            <div id="statsContent" class="space-y-5">
-                <!-- 统计内容将在这里动态生成 -->
-            </div>
-            
+            <div id="statsContent" class="space-y-5"></div>
             <div class="mt-6 pt-4 border-t border-gray-100">
-                <button 
-                    onclick="exportData()"
-                    class="w-full py-3.5 border border-pink-200 rounded-xl text-pink-500 font-medium flex items-center justify-center gap-2 hover:bg-pink-50 transition-colors"
-                >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                    </svg>
+                <button onclick="exportData()" class="w-full py-3.5 border border-pink-200 rounded-xl text-pink-500 font-medium flex items-center justify-center gap-2 hover:bg-pink-50 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                     导出数据
                 </button>
             </div>
@@ -553,32 +263,27 @@
         <div class="bg-white rounded-3xl p-6 w-full max-w-sm card-shadow modal-fade">
             <div class="text-center mb-6">
                 <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                    </svg>
+                    <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                 </div>
                 <h3 class="text-lg font-semibold text-gray-800 mb-2">确认删除？</h3>
                 <p class="text-gray-400 text-sm">删除后无法恢复</p>
             </div>
             <div class="flex gap-3">
-                <button 
-                    onclick="closeDeleteModal()"
-                    class="flex-1 py-3.5 border border-gray-200 rounded-xl text-gray-500 font-medium hover:bg-gray-50 transition-colors"
-                >
-                    取消
-                </button>
-                <button 
-                    onclick="confirmDelete()"
-                    class="flex-1 bg-gradient-to-r from-red-400 to-red-500 text-white py-3.5 rounded-xl font-medium"
-                >
-                    删除
-                </button>
+                <button onclick="closeDeleteModal()" class="flex-1 py-3.5 border border-gray-200 rounded-xl text-gray-500 font-medium hover:bg-gray-50 transition-colors">取消</button>
+                <button onclick="confirmDelete()" class="flex-1 bg-gradient-to-r from-red-400 to-red-500 text-white py-3.5 rounded-xl font-medium">删除</button>
             </div>
         </div>
     </div>
 
     <script>
-        // ===== 数据管理 =====
+        // ===== GitHub 配置 =====
+        const GITHUB_CONFIG = {
+            token: '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',
+            owner: 'yb333',
+            repo: 'wedding-checklist',
+            path: 'data.json'
+        };
+        
         const STORAGE_KEY = 'wedding_checklist_tasks';
         const AUTH_KEY = 'wedding_checklist_auth';
         const PASSWORD = '1003';
@@ -586,98 +291,153 @@
         let tasks = [];
         let currentFilter = 'all';
         let deleteTaskId = null;
+        let githubSha = null; // 用于更新文件
         
-// ===== 预设事项 =====
-const DEFAULT_TASKS = [
-    // 婚前 6-7 个月（3月）
-    { id: '1', title: '预订婚礼场地/酒店', category: '场地酒店', date: '2026-03-15', completed: false },
-    { id: '2', title: '预订婚礼主持/司仪', category: '人员安排', date: '2026-03-15', completed: false },
-    { id: '3', title: '预订摄影师、摄像师', category: '摄影摄像', date: '2026-03-31', completed: false },
-    { id: '4', title: '预订婚礼策划师', category: '人员安排', date: '2026-03-31', completed: false },
-    
-    // 婚前 5-6 个月（4-5月）
-    { id: '5', title: '挑选并预订婚纱', category: '服装化妆', date: '2026-04-15', completed: false },
-    { id: '6', title: '挑选新郎西装/礼服', category: '服装化妆', date: '2026-04-15', completed: false },
-    { id: '7', title: '预订新娘化妆师（试妆）', category: '服装化妆', date: '2026-04-30', completed: false },
-    { id: '8', title: '拍摄婚纱照', category: '摄影摄像', date: '2026-05-15', completed: false },
-    { id: '9', title: '挑选伴娘服、伴郎服', category: '服装化妆', date: '2026-05-31', completed: false },
-    
-    // 婚前 4-5 个月（5-6月）
-    { id: '10', title: '确定婚宴菜单', category: '婚宴酒席', date: '2026-05-31', completed: false },
-    { id: '11', title: '挑选结婚戒指', category: '婚礼用品', date: '2026-06-15', completed: false },
-    { id: '12', title: '确定伴郎伴娘人选', category: '人员安排', date: '2026-06-15', completed: false },
-    { id: '13', title: '挑选婚礼请柬样式', category: '婚礼用品', date: '2026-06-30', completed: false },
-    
-    // 婚前 3-4 个月（6-7月）
-    { id: '14', title: '发送婚礼请柬', category: '婚礼用品', date: '2026-07-15', completed: false },
-    { id: '15', title: '准备喜糖及包装', category: '婚礼用品', date: '2026-07-15', completed: false },
-    { id: '16', title: '预订婚车（头车、车队）', category: '交通住宿', date: '2026-07-31', completed: false },
-    { id: '17', title: '安排外地宾客住宿', category: '交通住宿', date: '2026-07-31', completed: false },
-    { id: '18', title: '确定婚礼仪式流程', category: '仪式用品', date: '2026-07-31', completed: false },
-    
-    // 婚前 2 个月（8月）
-    { id: '19', title: '统计宾客名单，确认出席人数', category: '婚宴酒席', date: '2026-08-15', completed: false },
-    { id: '20', title: '安排宾客座位表', category: '婚宴酒席', date: '2026-08-31', completed: false },
-    { id: '21', title: '召集伴郎伴娘开会分工', category: '人员安排', date: '2026-08-31', completed: false },
-    { id: '22', title: '准备迎亲游戏道具', category: '婚礼用品', date: '2026-08-31', completed: false },
-    
-    // 婚前 1 个月（9月）
-    { id: '23', title: '与酒店确认最终细节', category: '场地酒店', date: '2026-09-10', completed: false },
-    { id: '24', title: '婚纱最终试穿修改', category: '服装化妆', date: '2026-09-10', completed: false },
-    { id: '25', title: '与摄影师沟通拍摄需求', category: '摄影摄像', date: '2026-09-15', completed: false },
-    { id: '26', title: '准备婚礼誓词', category: '仪式用品', date: '2026-09-15', completed: false },
-    { id: '27', title: '订购手捧花、胸花、腕花', category: '仪式用品', date: '2026-09-20', completed: false },
-    { id: '28', title: '兑换新钞准备红包', category: '婚礼用品', date: '2026-09-25', completed: false },
-    
-    // 婚前 1-2 周（9月中下旬）
-    { id: '29', title: '布置婚房/新房', category: '其他事项', date: '2026-09-26', completed: false },
-    { id: '30', title: '召开婚礼筹备会议（全体工作人员）', category: '人员安排', date: '2026-09-27', completed: false },
-    { id: '31', title: '染发、剪发、美甲', category: '服装化妆', date: '2026-09-28', completed: false },
-    { id: '32', title: '检查所有物品是否齐全', category: '其他事项', date: '2026-09-29', completed: false },
-    { id: '33', title: '与所有供应商最终确认时间', category: '其他事项', date: '2026-09-30', completed: false },
-    
-    // 婚前 1-3 天
-    { id: '34', title: '准备迎亲红包（堵门用）', category: '婚礼用品', date: '2026-10-01', completed: false },
-    { id: '35', title: '取回鲜花、蛋糕等易损物品', category: '仪式用品', date: '2026-10-02', completed: false },
-    
-    // 婚礼当天
-    { id: '36', title: '早起化妆造型', category: '服装化妆', date: '2026-10-03', completed: false },
-    { id: '37', title: '迎亲仪式', category: '仪式用品', date: '2026-10-03', completed: false },
-    { id: '38', title: '敬茶仪式', category: '仪式用品', date: '2026-10-03', completed: false },
-    { id: '39', title: '婚礼仪式', category: '仪式用品', date: '2026-10-03', completed: false },
-    { id: '40', title: '婚宴敬酒', category: '婚宴酒席', date: '2026-10-03', completed: false },
-    
-    // 其他重要事项
-    { id: '41', title: '办理结婚登记（领证）', category: '其他事项', date: '2026-06-01', completed: false },
-    { id: '42', title: '安排婚前体检', category: '其他事项', date: '2026-05-01', completed: false },
-    { id: '43', title: '新娘开始护肤美容计划', category: '服装化妆', date: '2026-03-01', completed: false },
-    { id: '44', title: '购买床上用品（嫁妆）', category: '婚礼用品', date: '2026-08-01', completed: false },
-    { id: '45', title: '准备婚礼回礼/伴手礼', category: '婚礼用品', date: '2026-09-01', completed: false },
-    { id: '46', title: '准备新娘应急包', category: '婚礼用品', date: '2026-09-25', completed: false },
-    { id: '47', title: '安排蜜月旅行', category: '其他事项', date: '2026-09-01', completed: false }
-];
-
-const INIT_KEY = 'wedding_checklist_initialized';
-
-// 初始化默认事项（仅首次）
-function initDefaultTasks() {
-    const initialized = localStorage.getItem(INIT_KEY);
-    if (initialized !== 'true' && tasks.length === 0) {
-        tasks = DEFAULT_TASKS;
-        saveTasks();
-        localStorage.setItem(INIT_KEY, 'true');
-    }
-}
+        // ===== 预设事项 =====
+        const DEFAULT_TASKS = [
+            { id: '1', title: '预订婚礼场地/酒店', category: '场地酒店', date: '2026-03-15', completed: false },
+            { id: '2', title: '预订婚礼主持/司仪', category: '人员安排', date: '2026-03-15', completed: false },
+            { id: '3', title: '预订摄影师、摄像师', category: '摄影摄像', date: '2026-03-31', completed: false },
+            { id: '4', title: '预订婚礼策划师', category: '人员安排', date: '2026-03-31', completed: false },
+            { id: '5', title: '挑选并预订婚纱', category: '服装化妆', date: '2026-04-15', completed: false },
+            { id: '6', title: '挑选新郎西装/礼服', category: '服装化妆', date: '2026-04-15', completed: false },
+            { id: '7', title: '预订新娘化妆师（试妆）', category: '服装化妆', date: '2026-04-30', completed: false },
+            { id: '8', title: '拍摄婚纱照', category: '摄影摄像', date: '2026-05-15', completed: false },
+            { id: '9', title: '挑选伴娘服、伴郎服', category: '服装化妆', date: '2026-05-31', completed: false },
+            { id: '10', title: '确定婚宴菜单', category: '婚宴酒席', date: '2026-05-31', completed: false },
+            { id: '11', title: '挑选结婚戒指', category: '婚礼用品', date: '2026-06-15', completed: false },
+            { id: '12', title: '确定伴郎伴娘人选', category: '人员安排', date: '2026-06-15', completed: false },
+            { id: '13', title: '挑选婚礼请柬样式', category: '婚礼用品', date: '2026-06-30', completed: false },
+            { id: '14', title: '发送婚礼请柬', category: '婚礼用品', date: '2026-07-15', completed: false },
+            { id: '15', title: '准备喜糖及包装', category: '婚礼用品', date: '2026-07-15', completed: false },
+            { id: '16', title: '预订婚车（头车、车队）', category: '交通住宿', date: '2026-07-31', completed: false },
+            { id: '17', title: '安排外地宾客住宿', category: '交通住宿', date: '2026-07-31', completed: false },
+            { id: '18', title: '确定婚礼仪式流程', category: '仪式用品', date: '2026-07-31', completed: false },
+            { id: '19', title: '统计宾客名单，确认出席人数', category: '婚宴酒席', date: '2026-08-15', completed: false },
+            { id: '20', title: '安排宾客座位表', category: '婚宴酒席', date: '2026-08-31', completed: false },
+            { id: '21', title: '召集伴郎伴娘开会分工', category: '人员安排', date: '2026-08-31', completed: false },
+            { id: '22', title: '准备迎亲游戏道具', category: '婚礼用品', date: '2026-08-31', completed: false },
+            { id: '23', title: '与酒店确认最终细节', category: '场地酒店', date: '2026-09-10', completed: false },
+            { id: '24', title: '婚纱最终试穿修改', category: '服装化妆', date: '2026-09-10', completed: false },
+            { id: '25', title: '与摄影师沟通拍摄需求', category: '摄影摄像', date: '2026-09-15', completed: false },
+            { id: '26', title: '准备婚礼誓词', category: '仪式用品', date: '2026-09-15', completed: false },
+            { id: '27', title: '订购手捧花、胸花、腕花', category: '仪式用品', date: '2026-09-20', completed: false },
+            { id: '28', title: '兑换新钞准备红包', category: '婚礼用品', date: '2026-09-25', completed: false },
+            { id: '29', title: '布置婚房/新房', category: '其他事项', date: '2026-09-26', completed: false },
+            { id: '30', title: '召开婚礼筹备会议', category: '人员安排', date: '2026-09-27', completed: false },
+            { id: '31', title: '染发、剪发、美甲', category: '服装化妆', date: '2026-09-28', completed: false },
+            { id: '32', title: '检查所有物品是否齐全', category: '其他事项', date: '2026-09-29', completed: false },
+            { id: '33', title: '与所有供应商最终确认时间', category: '其他事项', date: '2026-09-30', completed: false },
+            { id: '34', title: '准备迎亲红包（堵门用）', category: '婚礼用品', date: '2026-10-01', completed: false },
+            { id: '35', title: '取回鲜花、蛋糕等易损物品', category: '仪式用品', date: '2026-10-02', completed: false },
+            { id: '36', title: '早起化妆造型', category: '服装化妆', date: '2026-10-03', completed: false },
+            { id: '37', title: '迎亲仪式', category: '仪式用品', date: '2026-10-03', completed: false },
+            { id: '38', title: '敬茶仪式', category: '仪式用品', date: '2026-10-03', completed: false },
+            { id: '39', title: '婚礼仪式', category: '仪式用品', date: '2026-10-03', completed: false },
+            { id: '40', title: '婚宴敬酒', category: '婚宴酒席', date: '2026-10-03', completed: false },
+            { id: '41', title: '办理结婚登记（领证）', category: '其他事项', date: '2026-06-01', completed: false },
+            { id: '42', title: '安排婚前体检', category: '其他事项', date: '2026-05-01', completed: false },
+            { id: '43', title: '新娘开始护肤美容计划', category: '服装化妆', date: '2026-03-01', completed: false },
+            { id: '44', title: '购买床上用品（嫁妆）', category: '婚礼用品', date: '2026-08-01', completed: false },
+            { id: '45', title: '准备婚礼回礼/伴手礼', category: '婚礼用品', date: '2026-09-01', completed: false },
+            { id: '46', title: '准备新娘应急包', category: '婚礼用品', date: '2026-09-25', completed: false },
+            { id: '47', title: '安排蜜月旅行', category: '其他事项', date: '2026-09-01', completed: false }
+        ];
         
-        // 加载数据
+        const INIT_KEY = 'wedding_checklist_initialized';
+        
+        // ===== 同步状态 =====
+        function setSyncStatus(status) {
+            const el = document.getElementById('syncStatus');
+            el.className = 'sync-status ' + status;
+            if (status === 'sync-ok') el.textContent = '已同步';
+            else if (status === 'sync-pending') el.textContent = '同步中...';
+            else if (status === 'sync-error') el.textContent = '同步失败';
+        }
+        
+        // ===== GitHub API =====
+        async function loadFromGitHub() {
+            try {
+                const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
+                const response = await fetch(url, {
+                    headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` }
+                });
+                
+                if (!response.ok) throw new Error('GitHub API error');
+                
+                const data = await response.json();
+                githubSha = data.sha;
+                
+                const content = JSON.parse(atob(data.content));
+                if (content.tasks && content.tasks.length > 0) {
+                    tasks = content.tasks;
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+                    return true;
+                }
+                return false;
+            } catch (e) {
+                console.log('GitHub load failed:', e);
+                return false;
+            }
+        }
+        
+        async function saveToGitHub() {
+            setSyncStatus('sync-pending');
+            try {
+                const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
+                const content = {
+                    tasks: tasks,
+                    lastUpdated: new Date().toISOString()
+                };
+                
+                const body = {
+                    message: `更新数据 ${new Date().toLocaleString('zh-CN')}`,
+                    content: btoa(unescape(encodeURIComponent(JSON.stringify(content, null, 2)))),
+                    sha: githubSha
+                };
+                
+                const response = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${GITHUB_CONFIG.token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+                
+                if (!response.ok) throw new Error('GitHub save error');
+                
+                const data = await response.json();
+                githubSha = data.content.sha;
+                setSyncStatus('sync-ok');
+                return true;
+            } catch (e) {
+                console.error('GitHub save failed:', e);
+                setSyncStatus('sync-error');
+                return false;
+            }
+        }
+        
+        // ===== 数据管理 =====
         function loadTasks() {
             const data = localStorage.getItem(STORAGE_KEY);
             tasks = data ? JSON.parse(data) : [];
         }
         
-        // 保存数据
-        function saveTasks() {
+        function saveTasks(syncToCloud = true) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+            if (syncToCloud) {
+                saveToGitHub();
+            }
+        }
+        
+        function initDefaultTasks() {
+            const initialized = localStorage.getItem(INIT_KEY);
+            if (initialized !== 'true' && tasks.length === 0) {
+                tasks = DEFAULT_TASKS;
+                saveTasks();
+                localStorage.setItem(INIT_KEY, 'true');
+            }
         }
         
         // ===== 密码验证 =====
@@ -694,25 +454,29 @@ function initDefaultTasks() {
             }
         }
         
-        function showMainApp() {
+        async function showMainApp() {
             document.getElementById('authScreen').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
+            
+            setSyncStatus('sync-pending');
             loadTasks();
-            initDefaultTasks();
+            
+            // 尝试从 GitHub 加载
+            const loaded = await loadFromGitHub();
+            if (!loaded) {
+                initDefaultTasks();
+            }
+            
             renderTasks();
+            setSyncStatus('sync-ok');
         }
         
-        // ===== 渲染任务列表 =====
+        // ===== 渲染 =====
         function renderTasks() {
             const taskList = document.getElementById('taskList');
             const emptyState = document.getElementById('emptyState');
             
-            // 筛选
-            let filteredTasks = currentFilter === 'all' 
-                ? tasks 
-                : tasks.filter(t => t.category === currentFilter);
-            
-            // 排序：未完成在前，按截止日期排序
+            let filteredTasks = currentFilter === 'all' ? tasks : tasks.filter(t => t.category === currentFilter);
             filteredTasks.sort((a, b) => {
                 if (a.completed !== b.completed) return a.completed ? 1 : -1;
                 return new Date(a.date) - new Date(b.date);
@@ -734,45 +498,17 @@ function initDefaultTasks() {
             today.setHours(0, 0, 0, 0);
             const taskDate = new Date(task.date);
             taskDate.setHours(0, 0, 0, 0);
-            
             const daysLeft = Math.ceil((taskDate - today) / (1000 * 60 * 60 * 24));
             
-            let urgencyClass = 'normal';
-            let dateTagClass = 'tag-date';
-            let dateText = formatDate(task.date);
-            
-            if (task.completed) {
-                urgencyClass = 'normal';
-                dateTagClass = 'tag-date';
-            } else if (daysLeft < 0) {
-                urgencyClass = 'overdue';
-                dateTagClass = 'tag-urgent';
-                dateText = `已逾期 ${Math.abs(daysLeft)} 天`;
-            } else if (daysLeft === 0) {
-                urgencyClass = 'urgent';
-                dateTagClass = 'tag-urgent';
-                dateText = '今天截止';
-            } else if (daysLeft <= 7) {
-                urgencyClass = 'urgent';
-                dateTagClass = 'tag-urgent';
-                dateText = `${daysLeft} 天后`;
-            } else if (daysLeft <= 30) {
-                urgencyClass = 'warning';
-                dateTagClass = 'tag-warning';
-                dateText = `${daysLeft} 天后`;
+            let urgencyClass = 'normal', dateTagClass = 'tag-date', dateText = formatDate(task.date);
+            if (!task.completed) {
+                if (daysLeft < 0) { urgencyClass = 'overdue'; dateTagClass = 'tag-urgent'; dateText = `已逾期 ${Math.abs(daysLeft)} 天`; }
+                else if (daysLeft === 0) { urgencyClass = 'urgent'; dateTagClass = 'tag-urgent'; dateText = '今天截止'; }
+                else if (daysLeft <= 7) { urgencyClass = 'urgent'; dateTagClass = 'tag-urgent'; dateText = `${daysLeft} 天后`; }
+                else if (daysLeft <= 30) { urgencyClass = 'warning'; dateTagClass = 'tag-warning'; dateText = `${daysLeft} 天后`; }
             }
             
-            const categoryEmoji = {
-                '场地酒店': '🏨',
-                '服装化妆': '👗',
-                '摄影摄像': '📷',
-                '婚宴酒席': '🍽️',
-                '婚礼用品': '🎁',
-                '人员安排': '👥',
-                '交通住宿': '🚗',
-                '仪式用品': '💒',
-                '其他事项': '📌'
-            };
+            const emoji = {'场地酒店':'🏨','服装化妆':'👗','摄影摄像':'📷','婚宴酒席':'🍽️','婚礼用品':'🎁','人员安排':'👥','交通住宿':'🚗','仪式用品':'💒','其他事项':'📌'}[task.category] || '📌';
             
             return `
                 <div class="task-card bg-white rounded-2xl overflow-hidden card-shadow relative ${task.completed ? 'task-completed' : ''}" data-id="${task.id}">
@@ -786,31 +522,22 @@ function initDefaultTasks() {
                             <div class="flex-1 min-w-0">
                                 <h3 class="task-title font-medium text-gray-800 leading-snug">${escapeHtml(task.title)}</h3>
                                 <div class="flex flex-wrap gap-1.5 mt-2.5">
-                                    <span class="tag tag-category">
-                                        ${categoryEmoji[task.category] || '📌'} ${task.category}
-                                    </span>
+                                    <span class="tag tag-category">${emoji} ${task.category}</span>
                                     ${task.person ? `<span class="tag tag-person">👤 ${escapeHtml(task.person)}</span>` : ''}
-                                    <span class="tag ${dateTagClass}">
-                                        📅 ${dateText}
-                                    </span>
+                                    <span class="tag ${dateTagClass}">📅 ${dateText}</span>
                                 </div>
                             </div>
                             <div class="flex gap-0.5">
                                 <button onclick="editTask('${task.id}')" class="p-2 text-gray-300 hover:text-pink-400 hover:bg-pink-50 rounded-lg transition-colors">
-                                    <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                    </svg>
+                                    <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                 </button>
                                 <button onclick="showDeleteModal('${task.id}')" class="p-2 text-gray-300 hover:text-red-400 hover:bg-red-50 rounded-lg transition-colors">
-                                    <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                    </svg>
+                                    <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                 </button>
                             </div>
                         </div>
                     </div>
-                </div>
-            `;
+                </div>`;
         }
         
         // ===== 任务操作 =====
@@ -820,14 +547,9 @@ function initDefaultTasks() {
                 task.completed = !task.completed;
                 saveTasks();
                 renderTasks();
-                
-                // 完成时庆祝动画
                 if (task.completed) {
                     const card = document.querySelector(`[data-id="${id}"]`);
-                    if (card) {
-                        card.classList.add('celebrate');
-                        setTimeout(() => card.classList.remove('celebrate'), 400);
-                    }
+                    if (card) { card.classList.add('celebrate'); setTimeout(() => card.classList.remove('celebrate'), 400); }
                 }
             }
         }
@@ -853,19 +575,9 @@ function initDefaultTasks() {
             }
         }
         
-        function closeAddModal() {
-            document.getElementById('addModal').classList.add('hidden');
-        }
-        
-        function showDeleteModal(id) {
-            deleteTaskId = id;
-            document.getElementById('deleteModal').classList.remove('hidden');
-        }
-        
-        function closeDeleteModal() {
-            deleteTaskId = null;
-            document.getElementById('deleteModal').classList.add('hidden');
-        }
+        function closeAddModal() { document.getElementById('addModal').classList.add('hidden'); }
+        function showDeleteModal(id) { deleteTaskId = id; document.getElementById('deleteModal').classList.remove('hidden'); }
+        function closeDeleteModal() { deleteTaskId = null; document.getElementById('deleteModal').classList.add('hidden'); }
         
         function confirmDelete() {
             if (deleteTaskId) {
@@ -876,10 +588,8 @@ function initDefaultTasks() {
             }
         }
         
-        // 表单提交
         document.getElementById('taskForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
             const id = document.getElementById('taskId').value;
             const title = document.getElementById('taskTitle').value.trim();
             const category = document.getElementById('taskCategory').value;
@@ -888,24 +598,10 @@ function initDefaultTasks() {
             
             if (id) {
                 const task = tasks.find(t => t.id === id);
-                if (task) {
-                    task.title = title;
-                    task.category = category;
-                    task.person = person;
-                    task.date = date;
-                }
+                if (task) { task.title = title; task.category = category; task.person = person; task.date = date; }
             } else {
-                tasks.push({
-                    id: Date.now().toString(),
-                    title,
-                    category,
-                    person,
-                    date,
-                    completed: false,
-                    createdAt: new Date().toISOString()
-                });
+                tasks.push({ id: Date.now().toString(), title, category, person, date, completed: false, createdAt: new Date().toISOString() });
             }
-            
             saveTasks();
             renderTasks();
             closeAddModal();
@@ -915,12 +611,8 @@ function initDefaultTasks() {
         document.getElementById('filterContainer').addEventListener('click', function(e) {
             const btn = e.target.closest('.filter-btn');
             if (btn) {
-                document.querySelectorAll('.filter-btn').forEach(b => {
-                    b.classList.remove('active');
-                    b.classList.add('text-gray-500');
-                });
-                btn.classList.add('active');
-                btn.classList.remove('text-gray-500');
+                document.querySelectorAll('.filter-btn').forEach(b => { b.classList.remove('active'); b.classList.add('text-gray-500'); });
+                btn.classList.add('active'); btn.classList.remove('text-gray-500');
                 currentFilter = btn.dataset.category;
                 renderTasks();
             }
@@ -931,157 +623,62 @@ function initDefaultTasks() {
             const total = tasks.length;
             const completed = tasks.filter(t => t.completed).length;
             const percent = total > 0 ? Math.round(completed / total * 100) : 0;
-            
             document.getElementById('statsText').textContent = `${completed}/${total} 已完成 · ${percent}%`;
             document.getElementById('progressBar').style.width = `${percent}%`;
         }
         
         function showStats() {
-            const total = tasks.length;
-            const completed = tasks.filter(t => t.completed).length;
-            const pending = total - completed;
-            
-            // 按分类统计
+            const total = tasks.length, completed = tasks.filter(t => t.completed).length, pending = total - completed;
             const categoryStats = {};
-            tasks.forEach(t => {
-                if (!categoryStats[t.category]) {
-                    categoryStats[t.category] = { total: 0, completed: 0 };
-                }
-                categoryStats[t.category].total++;
-                if (t.completed) categoryStats[t.category].completed++;
-            });
+            tasks.forEach(t => { if (!categoryStats[t.category]) categoryStats[t.category] = { total: 0, completed: 0 }; categoryStats[t.category].total++; if (t.completed) categoryStats[t.category].completed++; });
             
-            // 紧急事项
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const urgent = tasks.filter(t => {
-                if (t.completed) return false;
-                const taskDate = new Date(t.date);
-                taskDate.setHours(0, 0, 0, 0);
-                const daysLeft = Math.ceil((taskDate - today) / (1000 * 60 * 60 * 24));
-                return daysLeft <= 7;
-            }).length;
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            const urgent = tasks.filter(t => { if (t.completed) return false; const d = new Date(t.date); d.setHours(0,0,0,0); return Math.ceil((d - today) / 86400000) <= 7; }).length;
             
-            const categoryEmoji = {
-                '场地酒店': '🏨',
-                '服装化妆': '👗',
-                '摄影摄像': '📷',
-                '婚宴酒席': '🍽️',
-                '婚礼用品': '🎁',
-                '人员安排': '👥',
-                '交通住宿': '🚗',
-                '仪式用品': '💒',
-                '其他事项': '📌'
-            };
+            const emoji = {'场地酒店':'🏨','服装化妆':'👗','摄影摄像':'📷','婚宴酒席':'🍽️','婚礼用品':'🎁','人员安排':'👥','交通住宿':'🚗','仪式用品':'💒','其他事项':'📌'};
             
-            const statsContent = document.getElementById('statsContent');
-            statsContent.innerHTML = `
+            document.getElementById('statsContent').innerHTML = `
                 <div class="grid grid-cols-3 gap-3">
-                    <div class="stat-card">
-                        <div class="text-2xl font-bold text-pink-500">${total}</div>
-                        <div class="text-xs text-gray-400 mt-1">总事项</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="text-2xl font-bold text-emerald-500">${completed}</div>
-                        <div class="text-xs text-gray-400 mt-1">已完成</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="text-2xl font-bold text-amber-500">${pending}</div>
-                        <div class="text-xs text-gray-400 mt-1">待完成</div>
-                    </div>
+                    <div class="stat-card"><div class="text-2xl font-bold text-pink-500">${total}</div><div class="text-xs text-gray-400 mt-1">总事项</div></div>
+                    <div class="stat-card"><div class="text-2xl font-bold text-emerald-500">${completed}</div><div class="text-xs text-gray-400 mt-1">已完成</div></div>
+                    <div class="stat-card"><div class="text-2xl font-bold text-amber-500">${pending}</div><div class="text-xs text-gray-400 mt-1">待完成</div></div>
                 </div>
-                
-                ${urgent > 0 ? `
-                <div class="bg-red-50 rounded-2xl p-4 flex items-center justify-between">
-                    <span class="text-red-500 font-medium">⚠️ 一周内待办</span>
-                    <span class="text-xl font-bold text-red-500">${urgent}</span>
-                </div>
-                ` : ''}
-                
+                ${urgent > 0 ? `<div class="bg-red-50 rounded-2xl p-4 flex items-center justify-between"><span class="text-red-500 font-medium">⚠️ 一周内待办</span><span class="text-xl font-bold text-red-500">${urgent}</span></div>` : ''}
                 <div class="space-y-3">
                     <h3 class="font-semibold text-gray-700 text-sm">按分类统计</h3>
-                    ${Object.entries(categoryStats).map(([cat, stats]) => `
-                        <div class="flex items-center gap-3">
-                            <span class="text-sm">${categoryEmoji[cat] || '📌'}</span>
-                            <span class="flex-1 text-sm text-gray-600">${cat}</span>
-                            <div class="w-20 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                                <div class="h-full bg-gradient-to-r from-pink-400 to-pink-500 rounded-full transition-all" style="width: ${stats.total > 0 ? (stats.completed / stats.total * 100) : 0}%"></div>
-                            </div>
-                            <span class="text-xs text-gray-400 w-10 text-right">${stats.completed}/${stats.total}</span>
-                        </div>
-                    `).join('')}
+                    ${Object.entries(categoryStats).map(([cat, s]) => `<div class="flex items-center gap-3"><span class="text-sm">${emoji[cat]||'📌'}</span><span class="flex-1 text-sm text-gray-600">${cat}</span><div class="w-20 h-1.5 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-pink-400 to-pink-500 rounded-full" style="width:${s.total?Math.round(s.completed/s.total*100):0}%"></div></div><span class="text-xs text-gray-400 w-10 text-right">${s.completed}/${s.total}</span></div>`).join('')}
                 </div>
-                
                 <div class="bg-gradient-to-r from-pink-50 to-rose-50 rounded-2xl p-4">
-                    <div class="flex justify-between text-sm mb-2">
-                        <span class="text-gray-600 font-medium">整体进度</span>
-                        <span class="text-pink-500 font-bold">${total > 0 ? Math.round(completed / total * 100) : 0}%</span>
-                    </div>
-                    <div class="w-full h-2.5 bg-white rounded-full overflow-hidden">
-                        <div class="h-full progress-bar rounded-full transition-all duration-500" style="width: ${total > 0 ? (completed / total * 100) : 0}%"></div>
-                    </div>
-                </div>
-            `;
-            
+                    <div class="flex justify-between text-sm mb-2"><span class="text-gray-600 font-medium">整体进度</span><span class="text-pink-500 font-bold">${total?Math.round(completed/total*100):0}%</span></div>
+                    <div class="w-full h-2.5 bg-white rounded-full overflow-hidden"><div class="h-full progress-bar rounded-full" style="width:${total?Math.round(completed/total*100):0}%"></div></div>
+                </div>`;
             document.getElementById('statsModal').classList.remove('hidden');
         }
         
-        function closeStatsModal() {
-            document.getElementById('statsModal').classList.add('hidden');
-        }
+        function closeStatsModal() { document.getElementById('statsModal').classList.add('hidden'); }
         
-        // ===== 导出数据 =====
         function exportData() {
             const dataStr = JSON.stringify(tasks, null, 2);
             const blob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url;
+            a.href = URL.createObjectURL(blob);
             a.download = `婚礼筹备清单_${new Date().toISOString().split('T')[0]}.json`;
             a.click();
-            URL.revokeObjectURL(url);
         }
         
-        // ===== 工具函数 =====
-        function formatDate(dateStr) {
-            const date = new Date(dateStr);
-            return `${date.getMonth() + 1}月${date.getDate()}日`;
-        }
-        
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
+        function formatDate(dateStr) { const d = new Date(dateStr); return `${d.getMonth()+1}月${d.getDate()}日`; }
+        function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
         
         // ===== 初始化 =====
         document.addEventListener('DOMContentLoaded', function() {
-            const isAuthed = localStorage.getItem(AUTH_KEY) === 'true';
-            if (isAuthed) {
-                showMainApp();
-            } else {
-                document.getElementById('authScreen').classList.remove('hidden');
-            }
-            
-            document.getElementById('passwordInput').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    checkPassword();
-                }
-            });
+            if (localStorage.getItem(AUTH_KEY) === 'true') showMainApp();
+            else document.getElementById('authScreen').classList.remove('hidden');
+            document.getElementById('passwordInput').addEventListener('keypress', e => { if (e.key === 'Enter') checkPassword(); });
         });
         
-        // 点击模态框背景关闭
-        document.getElementById('addModal').addEventListener('click', function(e) {
-            if (e.target === this) closeAddModal();
-        });
-        
-        document.getElementById('statsModal').addEventListener('click', function(e) {
-            if (e.target === this) closeStatsModal();
-        });
-        
-        document.getElementById('deleteModal').addEventListener('click', function(e) {
-            if (e.target === this) closeDeleteModal();
-        });
+        document.getElementById('addModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeAddModal(); });
+        document.getElementById('statsModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeStatsModal(); });
+        document.getElementById('deleteModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeDeleteModal(); });
     </script>
 </body>
 </html>
