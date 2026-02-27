@@ -162,17 +162,29 @@
 
         <div class="sticky top-[100px] header-bg z-30">
             <div class="max-w-lg mx-auto px-4 py-3">
-                <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-hide" id="filterContainer">
-                    <button class="filter-btn active px-4 py-2 rounded-full text-sm border border-pink-200" data-category="all">✨ 全部</button>
-                    <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="场地酒店">🏨 场地</button>
-                    <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="服装化妆">👗 服装</button>
-                    <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="摄影摄像">📷 摄影</button>
-                    <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="婚宴酒席">🍽️ 婚宴</button>
-                    <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="婚礼用品">🎁 用品</button>
-                    <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="人员安排">👥 人员</button>
-                    <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="交通住宿">🚗 交通</button>
-                    <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="仪式用品">💒 仪式</button>
-                    <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="其他事项">📌 其他</button>
+                <div class="flex items-center gap-2">
+                    <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-hide flex-1" id="filterContainer">
+                        <button class="filter-btn active px-4 py-2 rounded-full text-sm border border-pink-200" data-category="all">✨ 全部</button>
+                        <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="场地酒店">🏨 场地</button>
+                        <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="服装化妆">👗 服装</button>
+                        <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="摄影摄像">📷 摄影</button>
+                        <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="婚宴酒席">🍽️ 婚宴</button>
+                        <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="婚礼用品">🎁 用品</button>
+                        <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="人员安排">👥 人员</button>
+                        <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="交通住宿">🚗 交通</button>
+                        <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="仪式用品">💒 仪式</button>
+                        <button class="filter-btn px-4 py-2 rounded-full text-sm border border-pink-200 text-gray-500" data-category="其他事项">📌 其他</button>
+                    </div>
+                    <div class="relative flex-shrink-0">
+                        <button onclick="toggleSortMenu()" class="p-2 text-gray-400 hover:text-pink-500 hover:bg-pink-50 rounded-xl transition-colors" id="sortBtn">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"></path></svg>
+                        </button>
+                        <div id="sortMenu" class="hidden absolute right-0 top-full mt-1 bg-white rounded-xl shadow-lg border border-pink-100 py-1 min-w-[140px] z-50">
+                            <button onclick="setSort('date')" class="sort-option w-full px-4 py-2 text-left text-sm hover:bg-pink-50 transition-colors" data-sort="date">📅 按截止日期</button>
+                            <button onclick="setSort('urgency')" class="sort-option w-full px-4 py-2 text-left text-sm hover:bg-pink-50 transition-colors" data-sort="urgency">🔥 按紧急程度</button>
+                            <button onclick="setSort('category')" class="sort-option w-full px-4 py-2 text-left text-sm hover:bg-pink-50 transition-colors" data-sort="category">📁 按分类</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -290,6 +302,7 @@
         
         let tasks = [];
         let currentFilter = 'all';
+        let currentSort = 'date'; // date | urgency | category
         let deleteTaskId = null;
         let githubSha = null; // 用于更新文件
         
@@ -477,9 +490,36 @@
             const emptyState = document.getElementById('emptyState');
             
             let filteredTasks = currentFilter === 'all' ? tasks : tasks.filter(t => t.category === currentFilter);
+            
+            // 排序逻辑
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
             filteredTasks.sort((a, b) => {
+                // 完成的任务排在后面
                 if (a.completed !== b.completed) return a.completed ? 1 : -1;
-                return new Date(a.date) - new Date(b.date);
+                
+                if (currentSort === 'date') {
+                    // 按截止日期排序（近的在前）
+                    return new Date(a.date) - new Date(b.date);
+                } else if (currentSort === 'urgency') {
+                    // 按紧急程度排序（紧急的在前）
+                    const getUrgency = (task) => {
+                        if (task.completed) return 4;
+                        const taskDate = new Date(task.date);
+                        taskDate.setHours(0, 0, 0, 0);
+                        const daysLeft = Math.ceil((taskDate - today) / (1000 * 60 * 60 * 24));
+                        if (daysLeft < 0) return 0; // 逾期
+                        if (daysLeft <= 7) return 1; // 紧急
+                        if (daysLeft <= 30) return 2; // 警告
+                        return 3; // 正常
+                    };
+                    return getUrgency(a) - getUrgency(b);
+                } else if (currentSort === 'category') {
+                    // 按分类排序
+                    return a.category.localeCompare(b.category);
+                }
+                return 0;
             });
             
             if (filteredTasks.length === 0) {
@@ -614,6 +654,21 @@
                 document.querySelectorAll('.filter-btn').forEach(b => { b.classList.remove('active'); b.classList.add('text-gray-500'); });
                 btn.classList.add('active'); btn.classList.remove('text-gray-500');
                 currentFilter = btn.dataset.category;
+                renderTasks();
+            }
+        });
+        
+        // ===== 排序切换 =====
+        document.getElementById('sortContainer').addEventListener('click', function(e) {
+            const btn = e.target.closest('.sort-btn');
+            if (btn) {
+                document.querySelectorAll('.sort-btn').forEach(b => {
+                    b.classList.remove('active');
+                    b.classList.add('text-gray-500');
+                });
+                btn.classList.add('active');
+                btn.classList.remove('text-gray-500');
+                currentSort = btn.dataset.sort;
                 renderTasks();
             }
         });
