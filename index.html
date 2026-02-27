@@ -659,17 +659,33 @@
         });
         
         // ===== 排序切换 =====
-        document.getElementById('sortContainer').addEventListener('click', function(e) {
-            const btn = e.target.closest('.sort-btn');
-            if (btn) {
-                document.querySelectorAll('.sort-btn').forEach(b => {
-                    b.classList.remove('active');
-                    b.classList.add('text-gray-500');
-                });
-                btn.classList.add('active');
-                btn.classList.remove('text-gray-500');
-                currentSort = btn.dataset.sort;
-                renderTasks();
+        function toggleSortMenu() {
+            const menu = document.getElementById('sortMenu');
+            menu.classList.toggle('hidden');
+        }
+        
+        function setSort(sortType) {
+            currentSort = sortType;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.sort-option').forEach(btn => {
+                btn.classList.remove('bg-pink-50', 'text-pink-600');
+                if (btn.dataset.sort === sortType) {
+                    btn.classList.add('bg-pink-50', 'text-pink-600');
+                }
+            });
+            
+            // 隐藏菜单并重新渲染
+            document.getElementById('sortMenu').classList.add('hidden');
+            renderTasks();
+        }
+        
+        // 点击其他地方关闭排序菜单
+        document.addEventListener('click', function(e) {
+            const sortBtn = document.getElementById('sortBtn');
+            const sortMenu = document.getElementById('sortMenu');
+            if (sortBtn && sortMenu && !sortBtn.contains(e.target) && !sortMenu.contains(e.target)) {
+                sortMenu.classList.add('hidden');
             }
         });
         
