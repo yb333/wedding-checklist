@@ -145,6 +145,11 @@
                     </div>
                     <div class="flex gap-2 items-center">
                         <span id="syncStatus" class="sync-status sync-ok">已同步</span>
+                        <button onclick="manualSync()" class="p-2 text-gray-400 hover:text-pink-500 hover:bg-pink-50 rounded-xl transition-colors" title="同步数据">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                            </svg>
+                        </button>
                         <button onclick="showStats()" class="p-2.5 text-pink-400 hover:bg-pink-50 rounded-xl transition-colors">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
@@ -471,17 +476,65 @@
             document.getElementById('authScreen').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
             
-            setSyncStatus('sync-pending');
+            // 先加载本地数据
             loadTasks();
             
-            // 尝试从 GitHub 加载
-            const loaded = await loadFromGitHub();
-            if (!loaded) {
-                initDefaultTasks();
+            // 如果本地没有数据，才尝试从 GitHub 加载
+            if (tasks.length === 0) {
+                setSyncStatus('sync-pending');
+                const loaded = await loadFromGitHub();
+                if (!loaded) {
+                    initDefaultTasks();
+                }
             }
             
             renderTasks();
             setSyncStatus('sync-ok');
+        }
+        
+        // ===== 手动同步 =====
+        async function manualSync() {
+            setSyncStatus('sync-pending');
+            
+            // 先尝试从 GitHub 拉取
+            const loaded = await loadFromGitHub();
+            
+            if (loaded) {
+                renderTasks();
+                setSyncStatus('sync-ok');
+                showToast('同步成功！已拉取最新数据');
+            } else {
+                // 拉取失败，尝试推送本地数据
+                const saved = await saveToGitHub();
+                if (saved) {
+                    setSyncStatus('sync-ok');
+                    showToast('同步成功！已推送本地数据');
+                } else {
+                    setSyncStatus('sync-error');
+                    showToast('同步失败，请检查网络');
+                }
+            }
+        }
+        
+        // ===== Toast 提示 =====
+        function showToast(message) {
+            // 创建 toast 元素
+            let toast = document.getElementById('toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toast';
+                toast.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-full text-sm z-50 opacity-0 transition-opacity duration-300';
+                document.body.appendChild(toast);
+            }
+            
+            toast.textContent = message;
+            toast.classList.remove('opacity-0');
+            toast.classList.add('opacity-100');
+            
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0');
+            }, 2000);
         }
         
         // ===== 渲染 =====
